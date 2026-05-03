@@ -9,44 +9,100 @@ jobs:
 
   unit-test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-      - run: chmod +x gradlew
-      - run: ./gradlew test
+
+      # ✅ Gradle Cache
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Grant Permission
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew test
 
   ui-test:
     runs-on: ubuntu-latest
-    needs: unit-test   # 👈 runs after unit test
+    needs: unit-test
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-      - uses: reactivecircus/android-emulator-runner@v2
+
+      # ✅ Gradle Cache
+      - name: Cache Gradle
+        uses: actions/cache@v3
         with:
-          api-level: 29
-          target: default
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Grant Permission
+        run: chmod +x gradlew
+
+      - name: Run UI Tests on Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
           arch: x86_64
+          profile: Nexus 6
           disable-animations: true
-          script: ./gradlew connectedAndroidTest
+          emulator-boot-timeout: 600
+          script: ./gradlew clean connectedDebugAndroidTest
 
   build-apk:
     runs-on: ubuntu-latest
-    needs: [unit-test, ui-test]   # 👈 runs ONLY if both pass
+    needs: [unit-test, ui-test]
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-      - run: chmod +x gradlew
-      - run: ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v3
+
+      # ✅ Gradle Cache
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Grant Permission
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
         with:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
