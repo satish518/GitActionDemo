@@ -42,22 +42,24 @@ jobs:
       - name: Grant Permission
         run: chmod +x gradlew
 
-      - name: Build APK + Test APK
-        run: ./gradlew assembleDebug assembleAndroidTest
-
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Run UI Tests on Emulator
+        uses: reactivecircus/android-emulator-runner@v2
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_3a
 
-      - name: Run UI Tests on Firebase Test Lab
-        run: |
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app app/build/outputs/apk/debug/app-debug.apk \
-            --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
-            --device model=Pixel2,version=30,locale=en,orientation=portrait
+          disable-animations: true
+          emulator-boot-timeout: 900
+
+          emulator-options: >
+            -no-snapshot
+            -no-window
+            -no-audio
+            -gpu swiftshader_indirect
+
+          script: ./gradlew connectedDebugAndroidTest
 
 
   build-apk:
