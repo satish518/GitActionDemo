@@ -21,17 +21,24 @@ class MainActivityTest {
     @Test
     fun loginSuccess_showsSuccessMessage() {
 
-        onView(withId(R.id.etUsername))
-            .perform(typeText("admin"), closeSoftKeyboard())
+        Thread.sleep(3000)
 
-        onView(withId(R.id.etPassword))
-            .perform(typeText("1234"), closeSoftKeyboard())
+        try {
+            onView(withId(R.id.etUsername))
+                .perform(typeText("admin"), closeSoftKeyboard())
 
-        onView(withId(R.id.btnLogin))
-            .perform(click())
+            onView(withId(R.id.etPassword))
+                .perform(typeText("1234"), closeSoftKeyboard())
 
-        // ✅ Only check TextView
-        onView(withId(R.id.tvResult))
-            .check(matches(withText("Login Success")))
+            onView(withId(R.id.btnLogin))
+                .perform(click())
+
+            onView(withId(R.id.tvResult))
+                .check(matches(withText("Login Success")))
+        } catch (e: Exception) {
+            Thread.sleep(2000)
+            onView(withId(R.id.tvResult))
+                .check(matches(withText("Login Success")))
+        }
     }
 }

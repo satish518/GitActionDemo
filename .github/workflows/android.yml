@@ -45,4 +45,5 @@ jobs:
           api-level: 29
           target: default
           arch: x86_64
+          disable-animations: true   # 👈 ADD THIS
           script: ./gradlew connectedAndroidTest
