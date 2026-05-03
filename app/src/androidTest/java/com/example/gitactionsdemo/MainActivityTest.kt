@@ -25,7 +25,7 @@ class MainActivityTest {
 
         try {
             onView(withId(R.id.etUsername))
-                .perform(typeText("admin"), closeSoftKeyboard())
+                .perform(typeText("user"), closeSoftKeyboard())
 
             onView(withId(R.id.etPassword))
                 .perform(typeText("1234"), closeSoftKeyboard())
