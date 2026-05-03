@@ -20,39 +20,41 @@ jobs:
 
   ui-test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
 
-      - name: Make gradlew executable always
-        run: chmod +x gradlew
+      - run: chmod +x gradlew
 
-      # 🔥 KEY FIX: Use v2.28.0 - most stable version
-      - name: Start Emulator & Run Tests
+      - name: Run UI Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2.28.0
         with:
           api-level: 30
           target: google_apis
           arch: x86_64
           profile: pixel_3a
+
           ram-size: 2G
-          sdcard: 512M
-          force-avd-creation: false
+          sdcard-path-or-size: 512M   # ✅ FIXED
+
           emulator-boot-timeout: 600
           disable-animations: true
+
           emulator-options: >
             -no-snapshot
             -no-window
             -no-audio
             -gpu swiftshader_indirect
+
           script: |
             adb wait-for-device
+            adb shell input keyevent 82
             ./gradlew connectedDebugAndroidTest
 
   build-apk:
