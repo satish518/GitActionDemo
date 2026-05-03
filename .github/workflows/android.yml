@@ -9,41 +9,44 @@ jobs:
 
   unit-test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup JDK
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Grant Permission
-        run: chmod +x gradlew
-
-      - name: Run Unit Tests
-        run: ./gradlew test
+      - run: chmod +x gradlew
+      - run: ./gradlew test
 
   ui-test:
     runs-on: ubuntu-latest
-
+    needs: unit-test   # 👈 runs after unit test
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup JDK
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Run UI Tests on Emulator
-        uses: reactivecircus/android-emulator-runner@v2
+      - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           target: default
           arch: x86_64
-          disable-animations: true   # 👈 ADD THIS
+          disable-animations: true
           script: ./gradlew connectedAndroidTest
+
+  build-apk:
+    runs-on: ubuntu-latest
+    needs: [unit-test, ui-test]   # 👈 runs ONLY if both pass
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - run: chmod +x gradlew
+      - run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v3
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
