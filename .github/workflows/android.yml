@@ -21,7 +21,7 @@ jobs:
 
   ui-test:
     runs-on: macos-latest   # ✅ more stable for emulator
-    needs: unit-test
+#    needs: unit-test
 
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
 
   build-apk:
     runs-on: ubuntu-latest
-    needs: unit-test   # ✅ don’t block on flaky UI test
+#    needs: unit-test   # ✅ don’t block on flaky UI test
 
     steps:
       - uses: actions/checkout@v4
