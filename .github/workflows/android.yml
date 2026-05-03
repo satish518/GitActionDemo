@@ -38,15 +38,19 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2.28.0
         with:
           api-level: 30
-          target: google
+          target: google_apis
           arch: x86_64
           profile: pixel_3a
           ram-size: 2G
           sdcard: 512M
           force-avd-creation: false
-          emulator-boot-timeout: 300
+          emulator-boot-timeout: 600
           disable-animations: true
-          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect
+          emulator-options: >
+            -no-snapshot
+            -no-window
+            -no-audio
+            -gpu swiftshader_indirect
           script: |
             adb wait-for-device
             ./gradlew connectedDebugAndroidTest
