@@ -18,27 +18,61 @@ class MainActivityTest {
     @get:Rule
     val rule = ActivityScenarioRule(MainActivity::class.java)
 
+    // 🔹 Helper function for login
+    private fun performLogin(username: String, password: String) {
+        onView(withId(R.id.etUsername))
+            .perform(replaceText(username), closeSoftKeyboard())
+
+        onView(withId(R.id.etPassword))
+            .perform(replaceText(password), closeSoftKeyboard())
+
+        onView(withId(R.id.btnLogin))
+            .perform(click())
+    }
+
+    // 🔹 Helper function to check result
+    private fun checkResult(expected: String) {
+        onView(withId(R.id.tvResult))
+            .check(matches(withText(expected)))
+    }
+
+    // ✅ 1. Success case
     @Test
-    fun loginSuccess_showsSuccessMessage() {
+    fun loginSuccess_validCredentials() {
 
-        Thread.sleep(3000)
+        performLogin("admin", "1234")
+        checkResult("Login Success")
+    }
 
-        try {
-            onView(withId(R.id.etUsername))
-                .perform(typeText("user"), closeSoftKeyboard())
+    // ❌ 2. Wrong username
+    @Test
+    fun loginFailure_wrongUsername() {
 
-            onView(withId(R.id.etPassword))
-                .perform(typeText("1234"), closeSoftKeyboard())
+        performLogin("user", "1234")
+        checkResult("Login Failed")
+    }
 
-            onView(withId(R.id.btnLogin))
-                .perform(click())
+    // ❌ 3. Wrong password
+    @Test
+    fun loginFailure_wrongPassword() {
 
-            onView(withId(R.id.tvResult))
-                .check(matches(withText("Login Success")))
-        } catch (e: Exception) {
-            Thread.sleep(2000)
-            onView(withId(R.id.tvResult))
-                .check(matches(withText("Login Success")))
-        }
+        performLogin("admin", "wrong")
+        checkResult("Login Failed")
+    }
+
+    // ❌ 4. Both wrong
+    @Test
+    fun loginFailure_bothWrong() {
+
+        performLogin("user", "wrong")
+        checkResult("Login Failed")
+    }
+
+    // ❌ 5. Empty fields
+    @Test
+    fun loginFailure_emptyFields() {
+
+        performLogin("", "")
+        checkResult("Login Failed")
     }
 }
