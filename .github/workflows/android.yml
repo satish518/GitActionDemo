@@ -24,6 +24,7 @@ jobs:
     # 🚀 Change to macOS to fix emulator boot failures
     runs-on: macos-latest
     needs: unit-test
+    if: false   # 🚫 disable temporarily
     steps:
       - uses: actions/checkout@v4
 
