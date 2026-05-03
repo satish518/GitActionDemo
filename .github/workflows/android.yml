@@ -23,8 +23,7 @@ jobs:
   ui-test:
     # 🚀 Change to macOS to fix emulator boot failures
     runs-on: macos-latest
-    needs: unit-test
-    if: false   # 🚫 disable temporarily
+#    needs: unit-test
     steps:
       - uses: actions/checkout@v4
 
