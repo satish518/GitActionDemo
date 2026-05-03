@@ -20,8 +20,7 @@ jobs:
       - run: ./gradlew test
 
   ui-test:
-    runs-on: macos-latest   # ✅ more stable for emulator
-#    needs: unit-test
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -37,20 +36,25 @@ jobs:
       - name: Run UI Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 28              # 🔥 more stable than 29/30
           target: default
           arch: x86
 
           disable-animations: true
-          emulator-boot-timeout: 1200
+          emulator-boot-timeout: 1500   # 🔥 increase more
 
           emulator-options: >
             -no-window
             -no-audio
             -no-snapshot
+            -no-boot-anim
             -gpu swiftshader_indirect
+            -accel off                 # 🔥 important for macOS runners
 
-          script: ./gradlew connectedDebugAndroidTest
+          script: |
+            adb wait-for-device
+            adb shell input keyevent 82
+            ./gradlew connectedDebugAndroidTest
 
   build-apk:
     runs-on: ubuntu-latest
