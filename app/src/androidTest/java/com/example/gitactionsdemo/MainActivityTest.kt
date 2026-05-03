@@ -22,7 +22,7 @@ class MainActivityTest {
     fun loginSuccess_showsSuccessMessage() {
 
         onView(withId(R.id.etUsername))
-            .perform(typeText("user"), closeSoftKeyboard())
+            .perform(typeText("admin"), closeSoftKeyboard())
 
         onView(withId(R.id.etPassword))
             .perform(typeText("1234"), closeSoftKeyboard())
